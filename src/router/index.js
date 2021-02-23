@@ -68,6 +68,11 @@ export default new Router({
 	  path: '/Home/setting',
 	  name: 'setting',
 	  component: (resolve) => require(['@/pages/setting'], resolve)
+	},
+	{
+	  path: '/Home/chapterList',
+	  name: 'chapterList',
+	  component: (resolve) => require(['@/pages/chapterList'], resolve)
 	}
   ]
 })

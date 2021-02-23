@@ -75,11 +75,7 @@ export default {
         console.log(this.fileList)
       }
     },
-    // vuextest() {
-    //   // this.$store.commit('SET_NUM', 123)
-    //   console.log('state的值')
-    //   console.log(this.$store.state.number)
-    // },
+
     onLoad() {
       // 异步更新数据      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
       this.finished = true
@@ -103,7 +99,7 @@ export default {
     // txt文本
     txtbtn() {
       console.log('txtbtn click')
-      this.vuextest()
+      // this.vuextest()
       document.getElementById('txt').click()
     },
     loadTextFromFile(e) {
@@ -122,14 +118,10 @@ export default {
       console.log(addfile)
       addfile.push(file.name)
       localStorage.setItem('fileList', JSON.stringify(addfile))
-
-      plus.io.requestFileSystem(plus.io.PRIVATE_WWW, function(fs) {
-        // 可通过fs进行文件操作
-        fs.root.createReader()
-        alert('Request file system success!')
-      }, function (e) {
-        alert('Request file system failed: ' + e.message)
-      })
+      localStorage.setItem('reading', file.name)
+      // 有一个全部已加入小说的列表。
+      // 所有章节名放一个列表，每个章节放一个localstorage,key是小说名+章节名
+      // 小说名(信息)-->章节列表-->小说名+章节名-->找到内容
 
       const reader = new FileReader()
       if (typeof FileReader === 'undefined') {
@@ -139,20 +131,85 @@ export default {
         // 加载完成后
         // console.log(event.target.result)
         console.log('导入成功')
+        // 匹配规则
+        let pest = /([第][一二三四五六七八九十百千0-9]{1,8}[章][^\\n]{1,15}[\n|\s|\r])/g
+
+        let content = event.target.result
+        let split_chapter = content.split(pest)
+        let chapterList = []
+        let len = split_chapter.length
+        for (let i = 1; i < len - 1; i += 2) {
+          // console.log(split_chapter[i])
+          // console.log(split_chapter[i + 1])
+
+          // 加入章节列表
+          chapterList.push(split_chapter[i])
+
+          // 对应章节内容缓存
+          that.storegeDB(split_chapter[i], split_chapter[i + 1])
+          // localStorage.setItem(file.name + split_chapter[i], split_chapter[i + 1])
+        }
+        localStorage.setItem(file.name + 'chapterList', JSON.stringify(chapterList))
         // localStorage.setItem(file.name, event.target.result)
+        this.$toast('导入成功')
       }
       reader.readAsText(file, 'utf-8')
+    },
+    add(db, chapterName, content) {
+      var request = db.transaction(['chapter'], 'readwrite')
+        .objectStore('chapter')
+        .add({chapterName, content})
 
-      // if (window.plus) {
-      //   plus.storage.setItem(file.name, file)
-      // } else {
-      //   document.addEventListener('plusready', plusReady => { plus.storage.setItem(file.name, file) }, false)
-      // }
-      // console.log('file log')
-      // console.log(file)
+      request.onsuccess = function (event) {
+        console.log('数据写入成功')
+      }
 
-      // console.log('storage log')
-      // console.log(plus.storage.getItem(file.name))
+      request.onerror = function (event) {
+        console.log('数据写入失败')
+      }
+    },
+    read(db, chapterName) {
+      var transaction = db.transaction(['chapter'])
+      var objectStore = transaction.objectStore('chapter')
+      // get参数是主键名
+      var request = objectStore.get(chapterName)
+
+      request.onerror = function(event) {
+        console.log('事务失败')
+      }
+
+      request.onsuccess = function(event) {
+        if (request.result) {
+
+        } else {
+          console.log('未获得数据记录')
+        }
+      }
+    },
+    storegeDB(chapterName, content) {
+      var db
+      var objectStore
+      let that = this
+      var request = indexedDB.open('MyindexedDB', 1)
+
+      request.onerror = function (event) {
+        console.log('error')
+      }
+      request.onsuccess = function (event) {
+        console.log('success')
+        db = request.result// 可以拿到数据库对象
+        that.add(db, chapterName, content)
+      }
+      // 如果指定的版本号，大于数据库的实际版本号，就会发生数据库升级事件upgradeneeded
+      request.onupgradeneeded = function (event) {
+        db = event.target.result
+        console.log('更新数据库')
+        if (!db.objectStoreNames.contains('chapter')) { // 判断是否存在
+          objectStore = db.createObjectStore('chapter', { keyPath: 'chapterName' })
+        }
+        // 新建索引，参数索引名称、索引所在的属性、配置对象
+        objectStore.createIndex('chapterName', 'chapterName', { unique: true })
+      }
     },
     showNovelList() {
       // plus.storage.getItem()

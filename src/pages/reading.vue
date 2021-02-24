@@ -1,8 +1,25 @@
 <template>
   <div class="content-box">
-    <div class="page-content" @click="showChapterList">
-      <h1>{{data}}</h1>
+    <div id="setting1" style="display:none">
+        <van-nav-bar :title="chapterName" left-text="返回" left-arrow  @click-left="onClickLeft"
+  @click-right="onClickRight">
+            <template #right>
+                <van-icon name="search" size="18" />
+            </template>
+        </van-nav-bar>
     </div>
+    <div class="page-content" @click="showChapterList">
+      <p>{{data}}</p>
+<!-- {{data}} -->
+    </div>
+      <div id="setting2" style="display:none">
+        <van-tabbar v-model="active">
+          <van-tabbar-item icon="home-o" to="/Home/chapterList">目录</van-tabbar-item>
+          <van-tabbar-item icon="search">进度</van-tabbar-item>
+          <van-tabbar-item icon="friends-o">设置</van-tabbar-item>
+          <van-tabbar-item icon="setting-o">夜间</van-tabbar-item>
+          </van-tabbar>
+      </div>
   </div>
 </template>
 
@@ -11,7 +28,9 @@ export default {
   data() {
     return {
       data: '',
-      bookname: ''
+      bookname: '',
+      active: 0,
+      chapterName: ''
     }
   },
   created() {
@@ -26,6 +45,12 @@ export default {
     tohome() {
       this.$router.goBack()
     },
+    onClickLeft() {
+      this.$router.push('/Home')
+    },
+    onClickRight() {
+      // 无
+    },
     add() {
       this.data++
     },
@@ -33,6 +58,7 @@ export default {
       // 获取记录上次/正在阅读的章节
       let bookname = sessionStorage.getItem('reading')
       let chapterName = localStorage.getItem(bookname + 'readingChapter')
+      this.chapterName = chapterName
       console.log('得到的章节名：' + chapterName)
       // 获取内容
       this.getcontentDB(chapterName)
@@ -52,7 +78,13 @@ export default {
       request.onsuccess = function(event) {
         if (request.result) {
           console.log('成功获取章节内容')
-          that.data = request.result
+          let content = request.result
+
+          that.data = JSON.stringify(content).toString().replace(/(\\r\\n)|({"chapterName":")|(","content":")/g, '\r\n  \r\n')
+          // that.data.replace('{"chapterName":"', '')
+          console.log(that.data)
+          // that.data = '我爱你\s\n小宝宝'\r\n
+          //
         } else {
           console.log('未获得数据记录')
         }
@@ -75,7 +107,15 @@ export default {
       }
     },
     showChapterList() {
-      this.$router.togo('/Home/chapterList')
+      if (document.getElementById('setting1').style.display === 'none') {
+        document.getElementById('setting1').style.display = ''
+        document.getElementById('setting2').style.display = ''
+        console.log('show')
+      } else {
+        document.getElementById('setting1').style.display = 'none'
+        document.getElementById('setting2').style.display = 'none'
+        console.log('hide')
+      }
     }
   }
 }
@@ -87,14 +127,18 @@ export default {
 @import "~styles/variable.less";
 .page-content{
     background-image: url(../assets/imgs/backgroud.png);
-font-size: 30px;
-word-wrap: break-word;
-word-break: break-all;
-overflow: auto;
+    font-size: 30px;
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow-y: auto;
+text-align: left;
+white-space: pre-wrap;//保留格式，使用换行符
+ // width: 300px;
 // overflow: hidden; /*自动隐藏文字*/
 // text-overflow: ellipsis;/*文字隐藏后添加省略号*/
 // white-space: nowrap;/*强制不换行*/
 // width: 20em;/*不允许出现半汉字截断*/
 
 }
+
 </style>

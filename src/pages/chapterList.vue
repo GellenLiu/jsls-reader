@@ -1,13 +1,10 @@
 <template>
 <div id="chapterList">
-<div>
-      <div class="left-icon">
-        <span  @click="back" class="icon-back"></span>
-      </div>
-      <div class="header-tittle">
-        <span >目录</span>
-      </div>
-<div>
+<van-nav-bar title="目录" left-text="返回" left-arrow @click-left="onClickLeft">
+  <template #right>
+    <van-icon name="search" size="18" />
+  </template>
+</van-nav-bar>
 <van-list
       v-model="loading"
       :finished="finished"
@@ -15,10 +12,10 @@
       @load="onLoad"
     >
 
-<van-cell
-v-for="item in chapterList" :key="item" class="vancell" @click="goReading(item)">
+    <van-cell size="large"
+        v-for="item in chapterList" :key="item" class="vancell" @click="goReading(item)">
 {{item}}
-</van-cell>
+    </van-cell>
 </van-list>
 </div>
 </template>
@@ -43,6 +40,9 @@ export default {
     },
     back() {
       this.$router.goBack()
+    },
+    onClickLeft() {
+      this.$router.goRight('/Home/reading')
     },
     onLoad() {
       // 异步更新数据      // setTimeout 仅做示例，真实场景中一般为 ajax 请求

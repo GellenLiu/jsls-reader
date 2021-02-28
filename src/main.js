@@ -4,6 +4,7 @@
 import Vue from 'vue'
 import App from './App'
 import Vuex from 'vuex'
+import axios from 'axios'
 import store from './store/index.js'
 import router from './router'
 import Mint from 'mint-ui'
@@ -15,11 +16,10 @@ import '../static/js/flexible.js'
 
 import Mui from 'vue-awesome-mui';
 Vue.config.productionTip = false
+Vue.prototype.$axios = axios
+// axios.defaults.baseURL = 'http://www.paoshuzw.com'  //关键代码
 Vue.use(Mui)
 Vue.use(vant)
-if (process.env.MOCK) {    // 判断是否为mock模式
-  require('./mock/index.js')
-}
 /**
 *监听浏览器点击返回前进操作动画
 *浏览器端使用需要注意路由path的创建，二级应该在一级的基础上添加
@@ -52,13 +52,6 @@ window.addEventListener('popstate', function(e) {
   }
 }, false)
 
-// app 修改状态栏颜色
-// document.addEventListener('plusready', function () {
-//   let System = window.plus.os.name
-//   if (System === 'iOS') {
-//     window.plus.navigator.setStatusBarBackground('#d81e06')
-//   }
-// })
 
 Vue.use(Mint)
 Vue.use(Vuex)
@@ -70,6 +63,7 @@ new Vue({
   router,
   store,
   Mint,
+  axios,
   Mui,
   components: { App },
   template: '<App/>'

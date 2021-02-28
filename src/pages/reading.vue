@@ -8,16 +8,21 @@
             </template>
         </van-nav-bar>
     </div>
-    <div class="page-content" @click="showChapterList">
+    <div class="page-content" id="content" @click="showChapterList" :style="styles.style1">
       <p>{{data}}</p>
 <!-- {{data}} -->
     </div>
+<div id="ad" style="display:none">
+        <button  @click="downsize">Aa-</button>
+        <button  @click="creasesize">Aa+</button>
+</div>
       <div id="setting2" style="display:none">
+
         <van-tabbar v-model="active">
           <van-tabbar-item icon="home-o" to="/Home/chapterList">目录</van-tabbar-item>
           <van-tabbar-item icon="search">进度</van-tabbar-item>
-          <van-tabbar-item icon="friends-o">设置</van-tabbar-item>
-          <van-tabbar-item icon="setting-o">夜间</van-tabbar-item>
+          <van-tabbar-item icon="friends-o" @click="setFont_size">设置</van-tabbar-item>
+          <van-tabbar-item icon="setting-o" @click="goodnight">夜间</van-tabbar-item>
           </van-tabbar>
       </div>
   </div>
@@ -30,7 +35,28 @@ export default {
       data: '',
       bookname: '',
       active: 0,
-      chapterName: ''
+      chapterName: '',
+      fontSize: '',
+      font_color: '',
+      backgroud: '',
+      styles: {
+        style1: {color: '#000', 'font-size': '10px'}, // 黑色
+        style2: {color: '#000', 'font-size': '15px'}, // 黑色
+        style3: {color: '#000', 'font-size': '20px'}, // 黑色
+        style4: {color: '#000', 'font-size': '25px'}, // 黑色
+        style5: {color: '#000', 'font-size': '30px'}, // 黑色
+        style6: {color: '#000', 'font-size': '35px'}, // 黑色
+        style7: {color: '#000', 'font-size': '40px'}, // 黑色
+        style8: {color: '#8f9894', 'font-size': '33px'}, // 灰色
+        style9: {color: '#8f9894', 'font-size': '10px'}, // 灰色
+        style10: {color: '#8f9894', 'font-size': '15px'}, // 黑灰色色
+        style11: {color: '#8f9894', 'font-size': '20px'}, // 黑灰色色
+        style12: {color: '#8f9894', 'font-size': '25px'}, // 灰色
+        style13: {color: '#8f9894', 'font-size': '30px'}, // 灰色
+        style14: {color: '#8f9894', 'font-size': '35px'}, // 灰色
+        style15: {color: '#8f9894', 'font-size': '40px'} // 黑色
+      }
+
     }
   },
   created() {
@@ -50,6 +76,16 @@ export default {
     },
     onClickRight() {
       // 无
+    },
+    downsize() {
+      document.getElementById('content').style.fontSize = '20px'
+    },
+    creasesize() {
+      document.getElementById('content').style.fontSize = '40px'
+    },
+    goodnight() {
+      this.font_color = '#888888'
+      this.backgroud = '#000'
     },
     add() {
       this.data++
@@ -114,7 +150,16 @@ export default {
       } else {
         document.getElementById('setting1').style.display = 'none'
         document.getElementById('setting2').style.display = 'none'
+        document.getElementById('ad').style.display = 'none'
         console.log('hide')
+      }
+    },
+    setFont_size() {
+      console.log('set fontsize')
+      if (document.getElementById('ad').style.display === 'none') {
+        document.getElementById('ad').style.display = ''
+      } else {
+        document.getElementById('ad').style.display = 'none'
       }
     }
   }
@@ -126,8 +171,6 @@ export default {
 @import "~styles/index.less";
 @import "~styles/variable.less";
 .page-content{
-    background-image: url(../assets/imgs/backgroud.png);
-    font-size: 30px;
     word-wrap: break-word;
     word-break: break-all;
     overflow-y: auto;
@@ -138,6 +181,10 @@ white-space: pre-wrap;//保留格式，使用换行符
 // text-overflow: ellipsis;/*文字隐藏后添加省略号*/
 // white-space: nowrap;/*强制不换行*/
 // width: 20em;/*不允许出现半汉字截断*/
+background-image: url(../assets/imgs/backgroud.png);
+// background-color: #c8c896;
+}
+#ad{
 
 }
 

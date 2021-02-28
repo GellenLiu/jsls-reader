@@ -12,8 +12,8 @@
       @load="onLoad"
     >
 
-    <van-cell size="large"
-        v-for="item in chapterList" :key="item" class="vancell" @click="goReading(item)">
+    <van-cell class="chaptercell"
+        v-for="(item,index) in chapterList" :key="index" @click="goReading(item)">
 {{item}}
     </van-cell>
 </van-list>
@@ -91,4 +91,9 @@ export default {
   .header-tittle{
     flex: 3;
   }
+.chaptercell{
+height: 8%;
+text-align: left;
+font-size: auto;
+}
 </style>

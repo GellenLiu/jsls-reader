@@ -3,15 +3,23 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-
+   
 let serverObj = {
   dev: {
-
+ proxyTable: {
+      '/api': {
+        target: 'http://localhost:8099',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+    },
     // Paths
     env: require('./dev.env'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    // proxyTable: {},
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
@@ -52,7 +60,15 @@ let serverObj = {
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: './',
-
+ // proxyTable: {
+ //      '/api': {
+ //        target: 'http://www.paoshuzw.com',
+ //        changeOrigin: true,
+ //        pathRewrite: {
+ //          '^/api': ''
+ //        }
+ //      }
+ //    },
     /**
      * Source Maps
      */

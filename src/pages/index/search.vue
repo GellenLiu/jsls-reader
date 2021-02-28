@@ -7,11 +7,11 @@
     @cancel="onCancel"></van-search>
 
     </div>
+<!-- <iframe src="http://www.paoshuzw.com/xiaoshuodaquan/" id="iframe1"></iframe> -->
   </div>
 </template>
 
 <script>
-import {mapMutations, mapGetters, mapState} from 'vuex'
 import commonHeader from 'common/common-header'
 export default {
   data () {
@@ -24,9 +24,6 @@ export default {
     }
   },
   methods: {
-    ...mapMutations({
-      setNum: 'SET_NUM'
-    }),
     plusReady () {
       var ws = plus.webview.currentWebview() // pw回车可输出plus.webview
       console.log('hello plus')
@@ -37,46 +34,40 @@ export default {
     onSearch(val) {
       console.log('search')
       this.titleNViewWebview()
+      // this.$axios.post('/api/getcontext/').then(res => {
+      //   console.log(res)
+      // })
+      // this.gethtml()
     },
     onCancel() {
       console.log('cancel')
     },
     titleNViewWebview() {
       let that = this
-      // var webview = plus.webview.open(that.baidu + that.value, 'test',
-      //   {'titleNView': {style: 'transparent',
-      //     'backgroundColor': '#D74B28',
-      //     'titleText': '网页',
-      //     'titleColor': '#CCCCCC',
-      //     autoBackButton: true
-      //   }})
+      // document.getElementsByClassName()
+      // document.getElementById("main").innerHTML
+      let spiderIndex = plus.webview.open('http://www.paoshuzw.com/xiaoshuodaquan/', 'spiderIndex')
 
-      var wsubPoint = plus.webview.create(that.baidu + that.value, 'baidu', {height: 530, bottom: 50, background: 'transparent'})
-      plus.webview.currentWebview().append(wsubPoint)
-      plus.key.addEventListener('backbutton', function() {
-        // var ws = plus.webview.currentWebview()
-        // ws.close()
-        console.log('listen back')
-        if (plus.webview.getWebviewById('baidu') !== null) {
-          console.log('hide baidu')
-          plus.webview.close('baidu')
-        }
-        let index = plus.webview.getLaunchWebview()
-        plus.webview.show(index)
-      })
+      spiderIndex.evalJS('console.log("js执行成功")')
+      spiderIndex.evalJS('let x = document.body.innerHTML;console.log(x)')
+      // plus.webview.getWebviewById('spiderIndex')
+    },
+    gethtml() {
+      var iframe = document.getElementById('iframe1')
+      var iwindow = iframe.contentWindow
+      var idoc = iwindow.document
+      console.log('window', iwindow)// 获取iframe的window对象
+      console.log('document', idoc) // 获取iframe的document
+      console.log('html', idoc.documentElement)// 获取iframe的html
+      console.log('head', idoc.head) // 获取head
+      console.log('body', idoc.body) // 获取body
     }
+
   },
   components: {
     commonHeader
   },
-  computed: {
-    ...mapGetters([
-      'number'
-    ]),
-    ...mapState({
-      number: state => state.home.number
-    })
-  },
+
   created () {
     // 扩展API是否准备好，如果没有则监听“plusready"事件
     if (window.plus) {

@@ -114,6 +114,7 @@ export default {
       request.onsuccess = function(event) {
         if (request.result) {
           console.log('成功获取章节内容')
+          // this.$toast('成功获取章节内容')
           let content = request.result
 
           that.data = JSON.stringify(content).toString().replace(/(\\r\\n)|({"chapterName":")|(","content":")/g, '\r\n  \r\n')
@@ -123,6 +124,7 @@ export default {
           //
         } else {
           console.log('未获得数据记录')
+          // this.$toast('未获得数据记录')
         }
       }
     },

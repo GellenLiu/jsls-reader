@@ -15,8 +15,8 @@
 v-for="item in fileList" :key="item" :title="item" right-width="65" class="vancell">
   <van-card
     num=""
-    price="更新至xxx"
-    desc="简介:七城战乱，邪神复苏的阴影笼罩在赤色大陆上空，家族争斗，对抗怪物，阶级跨越，人类一切的阴谋与仇恨，皆指向永夜传说，指向人与时间的诅咒。"
+    price="更新至"
+    desc="简介。"
     :title="item"
     class="goods-card"
     thumb="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi-1.edowning.net%2F2021%2F1%2F23%2F61ccdfbd-a6f2-490f-97c2-c39cadd94657.jpg&refer=http%3A%2F%2Fi-1.edowning.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1615172546&t=3759087eb7a7c328c3d25e9c2f1c8f28"
@@ -32,7 +32,6 @@ v-for="item in fileList" :key="item" :title="item" right-width="65" class="vance
 </div>
     <van-button round type="info" @click="txtbtn" id="loadtxtbtn">导入</van-button>
     <input type="file" ref="loadtxt" @change="loadTextFromFile" id="txt" style="display:none" />
-    <div>{{text}}</div>
 
     </div>
 <div>
@@ -42,7 +41,6 @@ v-for="item in fileList" :key="item" :title="item" right-width="65" class="vance
 </template>
 
 <script>
-import {mapGetters, mapState} from 'vuex'
 import commonHeader from 'common/common-header'
 
 export default {
@@ -75,31 +73,20 @@ export default {
         console.log(this.fileList)
       }
     },
-
     onLoad() {
       // 异步更新数据      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
       this.finished = true
     },
     plusReady () {
-      var ws = plus.webview.currentWebview() // pw回车可输出plus.webview
       console.log('hello plus')
     },
     reading(bookname) {
       sessionStorage.setItem('reading', bookname)
       this.$router.togo('/Home/reading')
     },
-    importBook() {
-      console.log('improt book')
-    },
-    afterRead(file) {
-      // 此时可以自行将文件上传至服务器
-      console.log(file)
-      console.log(this.fileList)
-    },
     // txt文本
     txtbtn() {
       console.log('txtbtn click')
-      // this.vuextest()
       document.getElementById('txt').click()
     },
     loadTextFromFile(e) {
@@ -122,7 +109,6 @@ export default {
       // 有一个全部已加入小说的列表。
       // 所有章节名放一个列表，每个章节放一个localstorage,key是小说名+章节名
       // 小说名(信息)-->章节列表-->小说名+章节名-->找到内容
-
       const reader = new FileReader()
       if (typeof FileReader === 'undefined') {
         alert('您的浏览器不支持FileReader接口')
@@ -151,11 +137,13 @@ export default {
         }
         localStorage.setItem(file.name + 'chapterList', JSON.stringify(chapterList))
         // localStorage.setItem(file.name, event.target.result)
-        this.$toast('导入成功')
+        that.$toast('导入成功')
+        that.init()
       }
       reader.readAsText(file, 'utf-8')
     },
     add(db, chapterName, content) {
+      let that = this
       var request = db.transaction(['chapter'], 'readwrite')
         .objectStore('chapter')
         .add({chapterName, content})
@@ -168,39 +156,21 @@ export default {
         console.log('数据写入失败')
       }
     },
-    read(db, chapterName) {
-      var transaction = db.transaction(['chapter'])
-      var objectStore = transaction.objectStore('chapter')
-      // get参数是主键名
-      var request = objectStore.get(chapterName)
-
-      request.onerror = function(event) {
-        console.log('事务失败')
-      }
-
-      request.onsuccess = function(event) {
-        if (request.result) {
-
-        } else {
-          console.log('未获得数据记录')
-        }
-      }
-    },
     storegeDB(chapterName, content) {
       var db
       var objectStore
       let that = this
-      var request = indexedDB.open('MyindexedDB', 1)
+      var request = indexedDB.open('MyindexedDB')
 
       request.onerror = function (event) {
-        console.log('error')
+        console.log('连接数据库失败')
       }
       request.onsuccess = function (event) {
-        console.log('success')
+        console.log('连接数据库成功')
         db = request.result// 可以拿到数据库对象
         that.add(db, chapterName, content)
       }
-      // 如果指定的版本号，大于数据库的实际版本号，就会发生数据库升级事件upgradeneeded
+      // 如果指定的版本号，创建/大于数据库的实际版本号，就会发生数据库升级事件upgradeneeded
       request.onupgradeneeded = function (event) {
         db = event.target.result
         console.log('更新数据库')
@@ -210,22 +180,11 @@ export default {
         // 新建索引，参数索引名称、索引所在的属性、配置对象
         objectStore.createIndex('chapterName', 'chapterName', { unique: true })
       }
-    },
-    showNovelList() {
-      // plus.storage.getItem()
     }
 
   },
   components: {
     commonHeader
-  },
-  computed: {
-    ...mapGetters([
-      'number'
-    ]),
-    ...mapState({
-      number: state => state.home.number
-    })
   },
   created () {
     // 扩展API是否准备好，如果没有则监听“plusready"事件

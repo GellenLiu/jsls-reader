@@ -1,72 +1,22 @@
-var http = require('http');
-var fs = require('fs');
-var cheerio = require('cheerio');
-var request = require('request');
-var i = 0;
-var url = "http://www.paoshuzw.com/xiaoshuodaquan/"; 
-//初始url 
-console.log("spider")
-function fetchPage(x) {     //封装了一层函数
-    startRequest(x); 
+function savefile(){
+console.log("savefile start")
+plus.io.requestFileSystem(plus.io.PRIVATE_DOC, function(success) {
+        success.root.getFile('gongyongchao.txt', { // 查找gongyongchao这个文件，有就打开，没有就创建一个
+          create: true
+        }, function(fileEntry) {
+          var Path = fileEntry.toURL() // 获取当前文件的路径
+          console.log(Path, '当前路径')
+          fileEntry.createWriter(function(data) { // 对文件进行写入操作
+            data.write('我写入成功')
+            console.log('写入成功')
+          }, function(e) {
+            console.log('写入失败')
+          })
+          console.log('创建了一个新的文件')
+        })
+        console.log('我已经进入了系统目录下')
+      }, function(e) {
+        console.log('我是调用失败的回调') // 失败的回调
+      })
 }
-
-
-function startRequest(x) {
-     //采用http模块向服务器发起一次get请求      
-    http.get(x, function (res) {     
-        var html = res;        //用来存储请求网页的整个html内容
-		
-        var titles = [];        
-        res.setEncoding('utf-8'); //防止中文乱码
-     //监听data事件，每次取一块数据
-	 // console.log(html)
-        res.on('data', function (chunk) {   
-            html += chunk;
-        });
-     //监听end事件，如果整个网页内容的html都获取完毕，就执行回调函数
-        res.on('end', function () {
-
-         let ht = cheerio.load(html); //采用cheerio模块解析html
-console.log(ht)
-         // var time = $('.article-info a:first-child').next().text().trim();
-
-        //  var news_item = {
-        //   //获取文章的标题
-        //     title: $('div.article-title a').text().trim(),
-        //  //获取文章发布的时间
-        //     Time: time,   
-        //  //获取当前文章的url
-        //     link: "http://www.ss.pku.edu.cn" + $("div.article-title a").attr('href'),
-        //  //获取供稿单位
-        //     author: $('[title=供稿]').text().trim(),  
-        // //i是用来判断获取了多少篇文章
-        //     i: i = i + 1,     
-
-        //     };
-
-  // console.log(news_item);     //打印新闻信息
-  // var news_title = $('div.article-title a').text().trim();
-
-  // savedContent($,news_title);  //存储每篇文章的内容及文章标题
-
-  // savedImg($,news_title);    //存储每篇文章的图片及图片标题
-
-
-  //            //下一篇文章的url
-  // var nextLink="http://www.ss.pku.edu.cn" + $("li.next a").attr('href');
-  //           str1 = nextLink.split('-');  //去除掉url后面的中文
-  //           str = encodeURI(str1[0]);  
-  //           //这是亮点之一，通过控制I,可以控制爬取多少篇文章.
-  //           if (i <= 500) {                
-  //               fetchPage(str);
-  //           }
-
-        });
-
-    }).on('error', function (err) {
-        console.log(err);
-    });
-
-}
-
-fetchPage(url);      //主程序开始运行
+savefile();
